@@ -165,9 +165,8 @@ const StudentAttendance = () => {
     }
 
     const handleScanSuccess = (result: any) => {
-        if (result) {
+        if (result && result.text) {
             setIsScanning(false)
-            // In a real app, you'd verify the QR code payload
             console.log('Scanned QR Code:', result.text)
             try {
                 const data = JSON.parse(result.text);
