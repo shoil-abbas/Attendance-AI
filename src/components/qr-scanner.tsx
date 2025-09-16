@@ -1,4 +1,3 @@
-
 'use client'
 import ReactQrScanner from 'react-qr-scanner';
 
@@ -24,4 +23,3 @@ export const QrScanner = ({ onResult, onError }: QrScannerProps) => {
         />
     )
 }
-
