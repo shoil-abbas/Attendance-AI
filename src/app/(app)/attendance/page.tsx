@@ -59,6 +59,7 @@ import Image from 'next/image'
 
 
 const TeacherAttendance = () => {
+    const { toast } = useToast()
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
     const [sessionStarted, setSessionStarted] = useState(false)
     const [attendanceMethod, setAttendanceMethod] = useState<'qr' | 'face' | null>(null)
