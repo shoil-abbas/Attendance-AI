@@ -1,6 +1,6 @@
 
 'use client'
-import { QrScanner as ReactQrScanner } from 'react-qr-scanner';
+import ReactQrScanner from 'react-qr-scanner';
 
 interface QrScannerProps {
     onResult: (result: any) => void;
@@ -24,3 +24,4 @@ export const QrScanner = ({ onResult, onError }: QrScannerProps) => {
         />
     )
 }
+
