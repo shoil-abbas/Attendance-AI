@@ -10,8 +10,7 @@ import {
   Settings,
   Shield,
 } from "lucide-react"
-
-import { Badge } from "@/components/ui/badge"
+import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -34,7 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
 import { UserNav } from "@/components/user-nav"
-import { UserProvider, useUser } from "@/contexts/user-context"
+import { useUser } from "@/contexts/user-context"
 
 const navItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard", roles: ['teacher', 'student', 'admin'] },
@@ -45,8 +44,9 @@ const navItems = [
     { href: "/settings", icon: Settings, label: "Settings", roles: ['teacher', 'student', 'admin'] },
 ]
 
-function AppLayoutContent({ children }: { children: React.ReactNode }) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { role } = useUser();
+    const pathname = usePathname();
     
     return (
         <SidebarProvider>
@@ -60,7 +60,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                             item.roles.includes(role) && (
                                 <SidebarMenuItem key={item.href}>
                                     <Link href={item.href}>
-                                        <SidebarMenuButton>
+                                        <SidebarMenuButton isActive={pathname === item.href}>
                                             <item.icon />
                                             <span>{item.label}</span>
                                         </SidebarMenuButton>
@@ -104,17 +104,4 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             </SidebarInset>
         </SidebarProvider>
     )
-}
-
-
-export default function AppLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <UserProvider>
-      <AppLayoutContent>{children}</AppLayoutContent>
-    </UserProvider>
-  )
 }

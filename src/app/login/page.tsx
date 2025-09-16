@@ -1,11 +1,23 @@
+'use client';
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
+import { useUser } from "@/contexts/user-context"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { setRole } = useUser()
+
+  const handleLogin = (role: 'teacher' | 'student' | 'admin') => {
+    setRole(role);
+    router.push('/dashboard');
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="mx-auto w-full max-w-sm">
@@ -25,6 +37,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                defaultValue="teacher@example.com"
               />
             </div>
             <div className="grid gap-2">
@@ -34,11 +47,13 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" required defaultValue="password" />
             </div>
-            <Button type="submit" className="w-full" asChild>
-                <Link href="/dashboard">Login</Link>
-            </Button>
+            <div className="grid gap-2">
+                <Button onClick={() => handleLogin('teacher')}>Login as Teacher</Button>
+                <Button onClick={() => handleLogin('student')} variant="secondary">Login as Student</Button>
+                <Button onClick={() => handleLogin('admin')} variant="outline">Login as Admin</Button>
+            </div>
             <Button variant="outline" className="w-full">
               Login with Google
             </Button>

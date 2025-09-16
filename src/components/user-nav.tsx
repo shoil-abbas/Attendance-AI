@@ -11,18 +11,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
-import { useUser, Role } from "@/contexts/user-context"
-import { User, Shield, BookUser, LogOut, Settings } from "lucide-react"
+import { useUser } from "@/contexts/user-context"
+import { User, LogOut, Settings } from "lucide-react"
 
 export function UserNav() {
-    const { role, setRole, name, avatar } = useUser()
+    const { role, name, avatar } = useUser()
 
   return (
     <DropdownMenu>
@@ -56,22 +50,6 @@ export function UserNav() {
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-         <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-                <BookUser className="mr-2 h-4 w-4" />
-                <span>Switch Role</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as Role)}>
-                    <DropdownMenuRadioItem value="teacher">Teacher</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="student">Student</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="admin">Admin</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
             <Link href="/login">

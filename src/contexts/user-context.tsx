@@ -1,11 +1,11 @@
 'use client';
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 
 export type Role = 'teacher' | 'student' | 'admin';
 
 interface UserContextType {
   role: Role;
-  setRole: (role: Role) => void;
+  setRole: (role: Role) => void; // This will be used by the login/signup pages
   name: string;
   avatar: string;
 }
@@ -27,6 +27,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [role]);
 
+  // The setRole function is exposed for login/signup purposes
   const value = {
     role,
     setRole,
