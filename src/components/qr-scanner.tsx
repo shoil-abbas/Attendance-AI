@@ -9,9 +9,14 @@ interface QrScannerProps {
 export const QrScanner = ({ onResult, onError }: QrScannerProps) => {
     
     const handleScan = (data: any) => {
-        if (data) {
+        if (data && data.text) {
             onResult(data);
         }
+    }
+
+    const previewStyle = {
+        height: 240,
+        width: 320,
     }
 
     return (
