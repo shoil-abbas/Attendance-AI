@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -44,6 +45,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from '@/contexts/user-context'
 import { classes, students, attendance } from '@/lib/mock-data'
 import FaceEnrollment from '@/components/face-enrollment'
+import { useToast } from '@/hooks/use-toast'
 
 const TeacherAttendance = () => {
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
@@ -135,7 +137,19 @@ const TeacherAttendance = () => {
     )
 }
 
-const StudentAttendance = () => (
+const StudentAttendance = () => {
+    const { toast } = useToast()
+
+    const handleScanQr = () => {
+        // In a real app, this would open the camera to scan.
+        // Here, we simulate a successful scan.
+        toast({
+            title: "Attendance Marked!",
+            description: "You have been successfully marked as present.",
+        })
+    }
+
+    return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
             <Card>
@@ -144,7 +158,7 @@ const StudentAttendance = () => (
                     <CardDescription>Join your class session using one of the methods below.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid md:grid-cols-2 gap-4">
-                     <Button size="lg" className="h-24">
+                     <Button size="lg" className="h-24" onClick={handleScanQr}>
                         <QrCode className="mr-2 h-6 w-6"/> Scan QR Code
                      </Button>
                      <Button size="lg" className="h-24" variant="secondary">
@@ -186,7 +200,8 @@ const StudentAttendance = () => (
             <FaceEnrollment />
         </div>
     </div>
-)
+    )
+}
 
 
 export default function AttendancePage() {
@@ -248,3 +263,5 @@ export default function AttendancePage() {
         </div>
     )
 }
+
+    
