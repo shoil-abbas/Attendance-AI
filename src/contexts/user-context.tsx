@@ -1,11 +1,12 @@
 'use client';
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 export type Role = 'teacher' | 'student' | 'admin';
 
 interface UserContextType {
   role: Role;
-  setRole: (role: Role) => void; // This will be used by the login/signup pages
+  setRole: (role: Role) => void;
   name: string;
   avatar: string;
 }
@@ -13,7 +14,22 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [role, setRole] = useState<Role>('teacher');
+  const [role, setRoleState] = useState<Role>(() => {
+    const savedRole = Cookies.get('userRole');
+    return (savedRole as Role) || 'teacher';
+  });
+
+  const setRole = (newRole: Role) => {
+    setRoleState(newRole);
+    Cookies.set('userRole', newRole, { expires: 7 }); // Cookie expires in 7 days
+  };
+
+  useEffect(() => {
+    const savedRole = Cookies.get('userRole');
+    if (savedRole && savedRole !== role) {
+      setRoleState(savedRole as Role);
+    }
+  }, []);
 
   const user = useMemo(() => {
     switch (role) {
@@ -27,7 +43,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [role]);
 
-  // The setRole function is exposed for login/signup purposes
   const value = {
     role,
     setRole,

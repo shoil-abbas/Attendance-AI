@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +17,14 @@ import { useUser } from "@/contexts/user-context"
 import { User, LogOut, Settings } from "lucide-react"
 
 export function UserNav() {
-    const { role, name, avatar } = useUser()
+    const { role, name, avatar, setRole } = useUser()
+    const router = useRouter()
+    
+    const handleLogout = () => {
+        // In a real app, you'd clear tokens/session here
+        setRole('teacher'); // Reset to a default role
+        router.push('/login');
+    }
 
   return (
     <DropdownMenu>
@@ -51,11 +59,9 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-            <Link href="/login">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-            </Link>
+        <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
