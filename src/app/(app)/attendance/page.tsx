@@ -2,14 +2,10 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { QRCodeSVG } from 'qrcode.react'
 import {
   Camera,
   QrCode,
-  Users,
-  Clock,
-  ChevronDown
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import {
@@ -44,9 +40,18 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from '@/contexts/user-context'
-import { classes, students, attendance } from '@/lib/mock-data'
+import { classes, attendance } from '@/lib/mock-data'
 import FaceEnrollment from '@/components/face-enrollment'
 import { useToast } from '@/hooks/use-toast'
+import { QrScanner } from '@/components/qr-scanner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+
 
 const TeacherAttendance = () => {
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
@@ -153,13 +158,45 @@ const TeacherAttendance = () => {
 
 const StudentAttendance = () => {
     const { toast } = useToast()
+    const [isScanning, setIsScanning] = useState(false)
 
     const handleScanQr = () => {
-        // In a real app, this would open the camera to scan.
-        // Here, we simulate a successful scan.
+        setIsScanning(true)
+    }
+
+    const handleScanSuccess = (result: any) => {
+        if (result) {
+            setIsScanning(false)
+            // In a real app, you'd verify the QR code payload
+            console.log('Scanned QR Code:', result.text)
+            try {
+                const data = JSON.parse(result.text);
+                if(data.classId && data.timestamp) {
+                     toast({
+                        title: "Attendance Marked!",
+                        description: "You have been successfully marked as present.",
+                    })
+                } else {
+                    throw new Error("Invalid QR code")
+                }
+            }
+            catch (e) {
+                toast({
+                    title: "Invalid QR Code",
+                    description: "The scanned QR code is not a valid attendance code.",
+                    variant: "destructive",
+                })
+            }
+        }
+    }
+
+    const handleScanError = (error: any) => {
+        console.error('QR Scan Error:', error)
+        setIsScanning(false)
         toast({
-            title: "Attendance Marked!",
-            description: "You have been successfully marked as present.",
+            title: "Scan Failed",
+            description: "Could not read QR code. Please try again.",
+            variant: "destructive",
         })
     }
 
@@ -213,6 +250,21 @@ const StudentAttendance = () => {
         <div className="space-y-6">
             <FaceEnrollment />
         </div>
+        <Dialog open={isScanning} onOpenChange={setIsScanning}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Scan QR Code</DialogTitle>
+                    <DialogDescription>
+                        Point your camera at the QR code displayed by the teacher.
+                    </DialogDescription>
+                </DialogHeader>
+                <QrScanner
+                    onResult={handleScanSuccess}
+                    onError={handleScanError}
+                />
+                 <Button variant="outline" onClick={() => setIsScanning(false)}>Cancel</Button>
+            </DialogContent>
+        </Dialog>
     </div>
     )
 }
@@ -277,5 +329,3 @@ export default function AttendancePage() {
         </div>
     )
 }
-
-    
