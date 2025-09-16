@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { QRCodeSVG } from 'qrcode.react'
 import {
   Camera,
   QrCode,
@@ -51,13 +52,26 @@ const TeacherAttendance = () => {
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
     const [sessionStarted, setSessionStarted] = useState(false)
     const [attendanceMethod, setAttendanceMethod] = useState<'qr' | 'face' | null>(null)
+    const [sessionQrValue, setSessionQrValue] = useState<string | null>(null)
 
     const handleStartSession = () => {
         if(selectedClass) {
             setSessionStarted(true)
+            // Generate a unique value for the QR code for this session
+            const sessionValue = JSON.stringify({
+                classId: selectedClass,
+                timestamp: Date.now(),
+            });
+            setSessionQrValue(sessionValue);
         }
     }
     
+    const handleEndSession = () => {
+        setSessionStarted(false); 
+        setAttendanceMethod(null);
+        setSessionQrValue(null);
+    }
+
     const currentClass = classes.find(c => c.id === selectedClass);
 
     return (
@@ -87,7 +101,7 @@ const TeacherAttendance = () => {
                     <div className="space-y-4">
                          <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">{currentClass?.name} Session</h3>
-                             <Button variant="outline" size="sm" onClick={() => { setSessionStarted(false); setAttendanceMethod(null)}}>End Session</Button>
+                             <Button variant="outline" size="sm" onClick={handleEndSession}>End Session</Button>
                          </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Button variant={attendanceMethod === 'qr' ? 'default' : 'outline'} size="lg" className="h-auto py-4" onClick={() => setAttendanceMethod('qr')}>
@@ -103,12 +117,12 @@ const TeacherAttendance = () => {
                                 </div>
                             </Button>
                         </div>
-                        {attendanceMethod === 'qr' && (
+                        {attendanceMethod === 'qr' && sessionQrValue && (
                             <Card className="flex flex-col items-center p-6 bg-secondary">
                                 <CardTitle>Scan to Join</CardTitle>
                                 <CardDescription>Students can scan this QR code to mark attendance.</CardDescription>
                                 <div className="p-4 my-4 bg-white rounded-lg">
-                                  <Image src="https://picsum.photos/seed/qr/300/300" alt="QR Code" width={300} height={300} data-ai-hint="QR code" />
+                                  <QRCodeSVG value={sessionQrValue} size={256} />
                                 </div>
                             </Card>
                         )}
