@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "Avatar of a user",
+      "imageUrl": "https://picsum.photos/seed/1/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar of another user",
+      "imageUrl": "https://picsum.photos/seed/2/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Avatar of a third user",
+      "imageUrl": "https://picsum.photos/seed/3/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-4",
+      "description": "Avatar of a fourth user",
+      "imageUrl": "https://picsum.photos/seed/4/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-5",
+      "description": "Avatar of a fifth user",
+      "imageUrl": "https://picsum.photos/seed/5/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "qr-code",
+      "description": "A sample QR code",
+      "imageUrl": "https://picsum.photos/seed/qr/300/300",
+      "imageHint": "QR code"
+    }
+  ]
 }
