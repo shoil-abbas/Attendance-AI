@@ -388,7 +388,7 @@ const StudentAttendance = () => {
     };
 
     const captureAndSubmit = () => {
-        if (videoRef.current && canvasRef.current) {
+        if (videoRef.current && canvasRef.current && user) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
             canvas.width = video.videoWidth;
@@ -404,8 +404,18 @@ const StudentAttendance = () => {
                         lon: position.coords.longitude,
                     };
                     
+                    const newVerificationRequest: FaceVerificationRequest = {
+                        id: `fv${Date.now()}`,
+                        student: { id: user.id, name: user.name, avatar: user.avatar },
+                        photoDataUri,
+                        location,
+                        timestamp: Date.now(),
+                        status: 'pending',
+                    };
+
                     // In a real app, this would be sent to a server.
-                    console.log("Submitting for verification:", { student: user, photoDataUri, location, timestamp: Date.now() });
+                    // Here we are pushing to the mock data array.
+                    faceVerificationRequests.push(newVerificationRequest);
                     
                     stopVerificationCamera();
                     setVerificationStatus('pending');
