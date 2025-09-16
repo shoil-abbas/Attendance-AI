@@ -38,6 +38,15 @@ export type Task = {
   isCompleted: boolean;
 };
 
+export type FaceVerificationRequest = {
+  id: string;
+  student: Student;
+  photoDataUri: string;
+  location: { lat: number; lon: number };
+  timestamp: number;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export const students: Student[] = [
   { id: 's1', name: 'Alice Johnson', avatar: 'https://picsum.photos/seed/1/100/100' },
   { id: 's2', name: 'Bob Williams', avatar: 'https://picsum.photos/seed/2/100/100' },
@@ -93,4 +102,23 @@ export const tasks: Task[] = [
   { id: 'task1', title: 'Complete Chapter 5 exercises', description: 'Solve problems 1 through 10 on page 150.', dueDate: '2024-06-05', class: classes[0], isCompleted: false },
   { id: 'task2', title: 'Essay on the Roman Empire', description: 'Write a 500-word essay on the fall of the Roman Empire.', dueDate: '2024-06-07', class: classes[1], isCompleted: true },
   { id: 'task3', title: 'Lab Report: Projectile Motion', description: 'Submit the full lab report from last week\'s experiment.', dueDate: '2024-06-03', class: classes[2], isCompleted: false },
+];
+
+export const faceVerificationRequests: FaceVerificationRequest[] = [
+    {
+        id: 'fv1',
+        student: students[3],
+        photoDataUri: 'https://picsum.photos/seed/4/400/400',
+        location: { lat: 34.0522, lon: -118.2437 },
+        timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
+        status: 'pending',
+    },
+     {
+        id: 'fv2',
+        student: students[4],
+        photoDataUri: 'https://picsum.photos/seed/5/400/400',
+        location: { lat: 40.7128, lon: -74.0060 },
+        timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
+        status: 'pending',
+    }
 ];

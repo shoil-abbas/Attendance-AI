@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import type { Student } from '@/lib/mock-data';
 
 export type Role = 'teacher' | 'student' | 'admin';
 
@@ -9,6 +10,7 @@ interface UserContextType {
   setRole: (role: Role) => void;
   name: string;
   avatar: string;
+  user: Student; 
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -34,12 +36,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const user = useMemo(() => {
     switch (role) {
       case 'student':
-        return { name: 'Alice Johnson', avatar: 'https://picsum.photos/seed/1/100/100' };
+        return { id: 's1', name: 'Alice Johnson', avatar: 'https://picsum.photos/seed/1/100/100' };
       case 'admin':
-        return { name: 'Admin User', avatar: 'https://picsum.photos/seed/99/100/100' };
+        return { id: 'admin1', name: 'Admin User', avatar: 'https://picsum.photos/seed/99/100/100' };
       case 'teacher':
       default:
-        return { name: 'Mr. David Smith', avatar: 'https://picsum.photos/seed/10/100/100' };
+        return { id: 't1', name: 'Mr. David Smith', avatar: 'https://picsum.photos/seed/10/100/100' };
     }
   }, [role]);
 
@@ -48,6 +50,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setRole,
     name: user.name,
     avatar: user.avatar,
+    user: user as Student, // Cast is safe for student role, others will have to be handled where used
   };
 
   return (
