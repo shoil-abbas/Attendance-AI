@@ -44,7 +44,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from '@/contexts/user-context'
-import { classes, attendance, students, faceVerificationRequests, FaceVerificationRequest } from '@/lib/mock-data'
+import { classes, attendance, students, faceVerificationRequests as initialFaceVerificationRequests, FaceVerificationRequest } from '@/lib/mock-data'
 import FaceEnrollment from '@/components/face-enrollment'
 import { useToast } from '@/hooks/use-toast'
 import {
@@ -58,13 +58,12 @@ import {
 import Image from 'next/image'
 
 
-const TeacherAttendance = () => {
+const TeacherAttendance = ({ verifications, setVerifications }: { verifications: FaceVerificationRequest[], setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
     const { toast } = useToast()
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
     const [sessionStarted, setSessionStarted] = useState(false)
     const [attendanceMethod, setAttendanceMethod] = useState<'qr' | 'face' | null>(null)
     const [sessionQrValue, setSessionQrValue] = useState<string | null>(null)
-    const [verifications, setVerifications] = useState(faceVerificationRequests);
 
     const handleVerification = (id: string, status: 'approved' | 'rejected') => {
         setVerifications(verifications.map(v => v.id === id ? {...v, status} : v));
@@ -266,7 +265,7 @@ const TeacherAttendance = () => {
     )
 }
 
-const StudentAttendance = () => {
+const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
     const { toast } = useToast();
     const { user } = useUser();
     const [isScanning, setIsScanning] = useState(false);
@@ -413,9 +412,7 @@ const StudentAttendance = () => {
                         status: 'pending',
                     };
 
-                    // In a real app, this would be sent to a server.
-                    // Here we are pushing to the mock data array.
-                    faceVerificationRequests.push(newVerificationRequest);
+                    setVerifications(prev => [...prev, newVerificationRequest]);
                     
                     stopVerificationCamera();
                     setVerificationStatus('pending');
@@ -544,11 +541,12 @@ const StudentAttendance = () => {
 
 export default function AttendancePage() {
     const { role } = useUser()
+    const [verifications, setVerifications] = useState(initialFaceVerificationRequests);
 
     return (
         <div className="flex flex-col gap-4 py-4">
             <h1 className="text-2xl font-bold">Attendance</h1>
-            {role === 'teacher' ? <TeacherAttendance /> : <StudentAttendance />}
+            {role === 'teacher' ? <TeacherAttendance verifications={verifications} setVerifications={setVerifications} /> : <StudentAttendance setVerifications={setVerifications} />}
         </div>
     )
 }
