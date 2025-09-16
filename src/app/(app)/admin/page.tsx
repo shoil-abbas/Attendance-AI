@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react';
 import { MoreHorizontal, PlusCircle } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -32,15 +33,36 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { students, teachers, classes } from "@/lib/mock-data"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import type { Student, Teacher, Class } from '@/lib/mock-data';
 
-const allUsers = [
-    ...teachers.map(t => ({...t, role: 'Teacher'})),
-    ...students.map(s => ({...s, role: 'Student'})),
-]
+type User = (Student | Teacher) & { role: 'Student' | 'Teacher' };
 
 export default function AdminPage() {
+    const [users, setUsers] = useState<User[]>([]);
+    const [classes, setClasses] = useState<Class[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const [usersRes, classesRes] = await Promise.all([
+                    fetch('/api/users'),
+                    fetch('/api/classes')
+                ]);
+                const usersData = await usersRes.json();
+                const classesData = await classesRes.json();
+                setUsers(usersData);
+                setClasses(classesData);
+            } catch (error) {
+                console.error("Failed to fetch admin data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
     return (
         <div className="flex flex-col gap-4 py-4">
             <h1 className="text-2xl font-bold">Admin Panel</h1>
@@ -77,7 +99,11 @@ export default function AdminPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {allUsers.map(user => (
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                        </TableRow>
+                                    ) : users.map(user => (
                                         <TableRow key={user.id}>
                                             <TableCell className="font-medium flex items-center gap-2">
                                                 <Avatar className="h-8 w-8">
@@ -131,7 +157,11 @@ export default function AdminPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {classes.map(c => (
+                                    {loading ? (
+                                         <TableRow>
+                                            <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                        </TableRow>
+                                    ) : classes.map(c => (
                                         <TableRow key={c.id}>
                                             <TableCell className="font-medium">{c.name}</TableCell>
                                             <TableCell>{c.teacher.name}</TableCell>
