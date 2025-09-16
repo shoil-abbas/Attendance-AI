@@ -9,14 +9,10 @@ interface QrScannerProps {
 export const QrScanner = ({ onResult, onError }: QrScannerProps) => {
     
     const handleScan = (data: any) => {
+        // Only trigger the onResult if we have a valid object with text
         if (data && data.text) {
             onResult(data);
         }
-    }
-
-    const previewStyle = {
-        height: 240,
-        width: 320,
     }
 
     return (

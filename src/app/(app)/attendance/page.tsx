@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState } from 'react'
@@ -165,36 +164,42 @@ const StudentAttendance = () => {
     }
 
     const handleScanSuccess = (result: any) => {
+        setIsScanning(false);
         if (result && result.text) {
-            setIsScanning(false)
-            console.log('Scanned QR Code:', result.text)
+            console.log('Scanned QR Code:', result.text);
             try {
                 const data = JSON.parse(result.text);
-                if(data.classId && data.timestamp) {
-                     toast({
+                if (data.classId && data.timestamp) {
+                    toast({
                         title: "Attendance Marked!",
                         description: "You have been successfully marked as present.",
-                    })
+                    });
                 } else {
-                    throw new Error("Invalid QR code")
+                    throw new Error("Invalid QR code data");
                 }
-            }
-            catch (e) {
-                toast({
+            } catch (e) {
+                 toast({
                     title: "Invalid QR Code",
                     description: "The scanned QR code is not a valid attendance code.",
                     variant: "destructive",
-                })
+                });
             }
+        } else {
+            // This case should ideally not be hit if qr-scanner is filtering correctly
+            toast({
+                title: "Scan Incomplete",
+                description: "No data was found in the QR code. Please try again.",
+                variant: "destructive",
+            });
         }
-    }
+    };
 
     const handleScanError = (error: any) => {
         console.error('QR Scan Error:', error)
         setIsScanning(false)
         toast({
             title: "Scan Failed",
-            description: "Could not read QR code. Please try again.",
+            description: "Could not read QR code. Please try again or check camera permissions.",
             variant: "destructive",
         })
     }
@@ -257,10 +262,12 @@ const StudentAttendance = () => {
                         Point your camera at the QR code displayed by the teacher.
                     </DialogDescription>
                 </DialogHeader>
-                <QrScanner
-                    onResult={handleScanSuccess}
-                    onError={handleScanError}
-                />
+                {isScanning && (
+                    <QrScanner
+                        onResult={handleScanSuccess}
+                        onError={handleScanError}
+                    />
+                )}
                  <Button variant="outline" onClick={() => setIsScanning(false)}>Cancel</Button>
             </DialogContent>
         </Dialog>
