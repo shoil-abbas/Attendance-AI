@@ -41,7 +41,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         return { id: 'admin1', name: 'Admin User', avatar: 'https://picsum.photos/seed/99/100/100' };
       case 'teacher':
       default:
-        return { id: 't1', name: 'Mr. David Smith', avatar: 'https://picsum.photos/seed/10/100/100' };
+        return { id: 't1', name: 'Mr. Abhay Choudhary', avatar: 'https://picsum.photos/seed/10/100/100' };
     }
   }, [role]);
 

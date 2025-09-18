@@ -56,7 +56,7 @@ export const students: Student[] = [
 ];
 
 export const teachers: Teacher[] = [
-  { id: 't1', name: 'Mr. David Smith', avatar: 'https://picsum.photos/seed/10/100/100' },
+  { id: 't1', name: 'Mr. Abhay Choudhary', avatar: 'https://picsum.photos/seed/10/100/100' },
   { id: 't2', name: 'Ms. Emily Jones', avatar: 'https://picsum.photos/seed/11/100/100' },
 ];
 

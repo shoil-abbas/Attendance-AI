@@ -100,7 +100,7 @@ export default function AdminDashboard() {
                     <TableBody>
                         <TableRow>
                             <TableCell>User Login</TableCell>
-                            <TableCell>Mr. David Smith</TableCell>
+                            <TableCell>Mr. Abhay Choudhary</TableCell>
                             <TableCell>2024-05-22 10:00 AM</TableCell>
                         </TableRow>
                          <TableRow>
