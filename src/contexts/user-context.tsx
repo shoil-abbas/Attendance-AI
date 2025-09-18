@@ -9,8 +9,7 @@ interface UserContextType {
   role: Role;
   setRole: (role: Role) => void;
   name: string;
-  avatar: string;
-  user: Student; 
+  user: Omit<Student, 'avatar'>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,12 +35,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const user = useMemo(() => {
     switch (role) {
       case 'student':
-        return { id: 's1', name: 'Alice Johnson', avatar: 'https://picsum.photos/seed/1/100/100' };
+        return { id: 's1', name: 'Alice Johnson' };
       case 'admin':
-        return { id: 'admin1', name: 'Admin User', avatar: 'https://picsum.photos/seed/99/100/100' };
+        return { id: 'admin1', name: 'Admin User' };
       case 'teacher':
       default:
-        return { id: 't1', name: 'Mr. Abhay Choudhary', avatar: 'https://picsum.photos/seed/10/100/100' };
+        return { id: 't1', name: 'Mr. Abhay Choudhary' };
     }
   }, [role]);
 
@@ -49,8 +48,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     role,
     setRole,
     name: user.name,
-    avatar: user.avatar,
-    user: user as Student, // Cast is safe for student role, others will have to be handled where used
+    user: user as Omit<Student, 'avatar'>, // Cast is safe for student role, others will have to be handled where used
   };
 
   return (

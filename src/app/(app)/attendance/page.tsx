@@ -42,10 +42,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useUser } from '@/contexts/user-context'
 import { classes, attendance, students, faceVerificationRequests as initialFaceVerificationRequests, FaceVerificationRequest } from '@/lib/mock-data'
-import FaceEnrollment from '@/components/face-enrollment'
 import { useToast } from '@/hooks/use-toast'
 import {
   Dialog,
@@ -55,7 +54,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import Image from 'next/image'
 
 
 const TeacherAttendance = ({ verifications, setVerifications }: { verifications: FaceVerificationRequest[], setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
@@ -160,7 +158,6 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
                                            {currentClass?.students.map((s, i) => (
                                                <div key={s.id} className="flex flex-col items-center gap-2">
                                                    <Avatar className={`w-20 h-20 border-4 ${verifications.find(v => v.student.id === s.id && v.status === 'approved') ? 'border-green-500' : verifications.find(v => v.student.id === s.id && v.status === 'pending') ? 'border-yellow-500' : 'border-gray-300'}`}>
-                                                       <AvatarImage src={s.avatar} />
                                                        <AvatarFallback>{s.name.charAt(0)}</AvatarFallback>
                                                    </Avatar>
                                                    <span className="text-sm text-center">{s.name}</span>
@@ -192,7 +189,6 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
                                         <div className="space-y-4">
                                              <div className="flex items-center gap-4">
                                                 <Avatar className="h-12 w-12">
-                                                    <AvatarImage src={req.student.avatar} />
                                                     <AvatarFallback>{req.student.name.charAt(0)}</AvatarFallback>
                                                 </Avatar>
                                                 <div>
@@ -210,9 +206,6 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
                                                      <span>{req.location.lat.toFixed(4)}, {req.location.lon.toFixed(4)}</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                         <div className="relative aspect-square w-full max-w-xs mx-auto">
-                                            <Image src={req.photoDataUri} alt={`Verification photo of ${req.student.name}`} layout="fill" objectFit="cover" className="rounded-lg"/>
                                         </div>
                                     </CardContent>
                                     <CardFooter className="flex justify-end gap-2">
@@ -379,7 +372,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                 videoRef.current.setAttribute("playsinline", "true");
                 await videoRef.current.play();
             }
-        } catch (err) {
+        } catch (err) => {
             console.error("Error accessing camera: ", err);
             toast({ title: "Camera Error", description: "Could not access camera. Please check permissions.", variant: "destructive" });
             setIsVerifying(false);
@@ -405,7 +398,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                     
                     const newVerificationRequest: FaceVerificationRequest = {
                         id: `fv${Date.now()}`,
-                        student: { id: user.id, name: user.name, avatar: user.avatar },
+                        student: { id: user.id, name: user.name },
                         photoDataUri,
                         location,
                         timestamp: Date.now(),
@@ -442,7 +435,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle>Join Session</CardTitle>
@@ -493,9 +486,6 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                         </Table>
                     </CardContent>
                 </Card>
-            </div>
-            <div className="space-y-6">
-                <FaceEnrollment />
             </div>
             <Dialog open={isScanning} onOpenChange={(open) => !open && stopScan()}>
                 <DialogContent className="sm:max-w-[425px]">

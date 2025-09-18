@@ -1,14 +1,17 @@
 export type Student = {
   id: string;
   name: string;
-  avatar: string;
 };
 
 export type Teacher = {
   id: string;
   name: string;
-  avatar: string;
 };
+
+export type Admin = {
+  id: string;
+  name: string;
+}
 
 export type Class = {
   id: string;
@@ -48,16 +51,16 @@ export type FaceVerificationRequest = {
 }
 
 export const students: Student[] = [
-  { id: 's1', name: 'Alice Johnson', avatar: 'https://picsum.photos/seed/1/100/100' },
-  { id: 's2', name: 'Bob Williams', avatar: 'https://picsum.photos/seed/2/100/100' },
-  { id: 's3', name: 'Charlie Brown', avatar: 'https://picsum.photos/seed/3/100/100' },
-  { id: 's4', name: 'Diana Miller', avatar: 'https://picsum.photos/seed/4/100/100' },
-  { id: 's5', name: 'Ethan Garcia', avatar: 'https://picsum.photos/seed/5/100/100' },
+  { id: 's1', name: 'Alice Johnson' },
+  { id: 's2', name: 'Bob Williams' },
+  { id: 's3', name: 'Charlie Brown' },
+  { id: 's4', name: 'Diana Miller' },
+  { id: 's5', name: 'Ethan Garcia' },
 ];
 
 export const teachers: Teacher[] = [
-  { id: 't1', name: 'Mr. Abhay Choudhary', avatar: 'https://picsum.photos/seed/10/100/100' },
-  { id: 't2', name: 'Ms. Emily Jones', avatar: 'https://picsum.photos/seed/11/100/100' },
+  { id: 't1', name: 'Mr. Abhay Choudhary' },
+  { id: 't2', name: 'Ms. Emily Jones' },
 ];
 
 export const classes: Class[] = [
@@ -108,7 +111,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
     {
         id: 'fv1',
         student: students[3],
-        photoDataUri: 'https://picsum.photos/seed/4/400/400',
+        photoDataUri: '',
         location: { lat: 34.0522, lon: -118.2437 },
         timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
         status: 'pending',
@@ -116,7 +119,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
      {
         id: 'fv2',
         student: students[4],
-        photoDataUri: 'https://picsum.photos/seed/5/400/400',
+        photoDataUri: '',
         location: { lat: 40.7128, lon: -74.0060 },
         timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
         status: 'pending',

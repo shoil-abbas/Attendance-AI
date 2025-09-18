@@ -13,10 +13,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useUser } from "@/contexts/user-context"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export default function SettingsPage() {
-  const { name, avatar } = useUser()
+  const { name } = useUser()
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -34,10 +34,8 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={avatar} />
                     <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <Button variant="outline">Change Photo</Button>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>

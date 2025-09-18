@@ -9,7 +9,7 @@ import {
 } from "lucide-react"
 
 import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -141,7 +141,6 @@ export default function TeacherDashboard() {
            {classes[0].students.slice(0,4).map((s, i) => (
              <div className="flex items-center gap-4" key={s.id}>
                 <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src={s.avatar} alt="Avatar" />
                 <AvatarFallback>{s.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="grid gap-1">

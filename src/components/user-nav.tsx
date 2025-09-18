@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import { useUser } from "@/contexts/user-context"
 import { LogOut, Settings } from "lucide-react"
 
 export function UserNav() {
-    const { role, name, avatar, setRole } = useUser()
+    const { role, name, setRole } = useUser()
     const router = useRouter()
     
     const handleLogout = () => {
@@ -31,7 +31,6 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={avatar} alt={name} />
             <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
         </Button>
