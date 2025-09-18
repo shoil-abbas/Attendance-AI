@@ -34,6 +34,7 @@ import {
 import { Icons } from "@/components/icons"
 import { UserNav } from "@/components/user-nav"
 import { useUser } from "@/contexts/user-context"
+import { useEffect, useState } from "react"
 
 const navItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard", roles: ['teacher', 'student', 'admin'] },
@@ -44,11 +45,28 @@ const navItems = [
     { href: "/settings", icon: Settings, label: "Settings", roles: ['teacher', 'student', 'admin'] },
 ]
 
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    if (!hasMounted) {
+        return null;
+    }
+
+    return <>{children}</>;
+}
+
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { role } = useUser();
     const pathname = usePathname();
     
     return (
+      <ClientOnly>
         <SidebarProvider>
             <Sidebar>
                 <SidebarHeader>
@@ -103,5 +121,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </main>
             </SidebarInset>
         </SidebarProvider>
+    </ClientOnly>
     )
 }
