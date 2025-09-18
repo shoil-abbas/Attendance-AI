@@ -9,7 +9,8 @@ import {
   MapPin,
   Clock,
   Check,
-  X
+  X,
+  Loader2,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import {
@@ -54,6 +55,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { verifyFace } from '@/ai/flows/verify-face'
 
 
 const TeacherAttendance = ({ verifications, setVerifications }: { verifications: FaceVerificationRequest[], setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
@@ -263,6 +265,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
     const { user } = useUser();
     const [isScanning, setIsScanning] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -379,8 +382,9 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
         }
     };
 
-    const captureAndSubmit = () => {
+    const captureAndSubmit = async () => {
         if (videoRef.current && canvasRef.current && user) {
+            setIsSubmitting(true);
             const video = videoRef.current;
             const canvas = canvasRef.current;
             canvas.width = video.videoWidth;
@@ -388,6 +392,28 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
             const context = canvas.getContext('2d');
             context?.drawImage(video, 0, 0, canvas.width, canvas.height);
             const photoDataUri = canvas.toDataURL('image/jpeg');
+
+            try {
+                const { hasFace, reason } = await verifyFace({ photoDataUri });
+                if (!hasFace) {
+                    toast({
+                        title: "Face Not Detected",
+                        description: reason || "Please ensure your face is clearly visible and try again.",
+                        variant: "destructive",
+                    });
+                    setIsSubmitting(false);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error verifying face:", error);
+                toast({
+                    title: "Verification Failed",
+                    description: "Could not verify the image. Please try again.",
+                    variant: "destructive",
+                });
+                setIsSubmitting(false);
+                return;
+            }
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -416,11 +442,11 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                 },
                 (error) => {
                     console.error("Error getting location: ", error);
-                    stopVerificationCamera();
                     toast({ title: "Location Error", description: "Could not get your location. Please enable location services.", variant: "destructive" });
-                }
+                }, { enableHighAccuracy: true }
             );
         }
+        setIsSubmitting(false);
     };
     
     const stopVerificationCamera = () => {
@@ -517,9 +543,10 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                          <canvas ref={canvasRef} className="hidden" />
                     </div>
                     <DialogFooter className="sm:justify-between">
-                         <Button variant="outline" onClick={stopVerificationCamera}>Cancel</Button>
-                         <Button onClick={captureAndSubmit}>
-                            <Camera className="mr-2 h-4 w-4" /> Capture and Submit
+                         <Button variant="outline" onClick={stopVerificationCamera} disabled={isSubmitting}>Cancel</Button>
+                         <Button onClick={captureAndSubmit} disabled={isSubmitting}>
+                            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+                             {isSubmitting ? 'Verifying...' : 'Capture and Submit'}
                          </Button>
                     </DialogFooter>
                 </DialogContent>
