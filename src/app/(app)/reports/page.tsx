@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { Download } from "lucide-react"
 
@@ -32,12 +33,27 @@ const chartData = [
 ]
 
 export default function ReportsPage() {
+  const [filteredAttendance, setFilteredAttendance] = useState<AttendanceRecord[]>(attendance);
+  const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedStudent, setSelectedStudent] = useState<string>('all');
+
+  useEffect(() => {
+    let data = attendance;
+    if (selectedClass !== 'all') {
+      data = data.filter(record => record.class.id === selectedClass);
+    }
+    if (selectedStudent !== 'all') {
+      data = data.filter(record => record.student.id === selectedStudent);
+    }
+    setFilteredAttendance(data);
+  }, [selectedClass, selectedStudent]);
+
 
   const handleExportCsv = () => {
     const headers = ["Student", "Class", "Date", "Status", "Method"];
     const csvRows = [
       headers.join(','),
-      ...attendance.map((record: AttendanceRecord) => 
+      ...filteredAttendance.map((record: AttendanceRecord) => 
         [
           `"${record.student.name}"`,
           `"${record.class.name}"`,
@@ -137,19 +153,21 @@ export default function ReportsPage() {
             <CardTitle>Detailed Report</CardTitle>
             <CardDescription>View and filter detailed attendance records.</CardDescription>
             <div className="flex gap-4 pt-4">
-                <Select>
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter by class" />
                     </SelectTrigger>
                     <SelectContent>
+                        <SelectItem value="all">All Classes</SelectItem>
                         {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                 </Select>
-                 <Select>
+                 <Select value={selectedStudent} onValueChange={setSelectedStudent}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter by student" />
                     </SelectTrigger>
                     <SelectContent>
+                        <SelectItem value="all">All Students</SelectItem>
                         {students.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
                     </SelectContent>
                 </Select>
@@ -167,7 +185,7 @@ export default function ReportsPage() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                {attendance.map((record) => (
+                {filteredAttendance.map((record) => (
                     <TableRow key={record.id}>
                     <TableCell className="font-medium">{record.student.name}</TableCell>
                     <TableCell>{record.class.name}</TableCell>
