@@ -105,9 +105,9 @@ export const attendance: AttendanceRecord[] = [
 ];
 
 export const tasks: Task[] = [
-  { id: 'task1', title: 'Complete Chapter 5 exercises', description: 'Solve problems 1 through 10 on page 150.', dueDate: '2024-06-05', class: classes[0], isCompleted: false },
-  { id: 'task2', title: 'Essay on the Roman Empire', description: 'Write a 500-word essay on the fall of the Roman Empire.', dueDate: '2024-06-07', class: classes[1], isCompleted: true },
-  { id: 'task3', title: 'Lab Report: Projectile Motion', description: 'Submit the full lab report from last week\'s experiment.', dueDate: '2024-06-03', class: classes[2], isCompleted: false },
+  { id: 'task1', title: 'Assignment 1', description: 'Solve problems 1 through 10 on page 150.', dueDate: '2024-06-05', class: classes[0], isCompleted: false },
+  { id: 'task2', title: 'Assignment 2', description: 'Write a 500-word essay on the fall of the Roman Empire.', dueDate: '2024-06-07', class: classes[1], isCompleted: true },
+  { id: 'task3', title: 'Assignment 3', description: 'Submit the full lab report from last week\'s experiment.', dueDate: '2024-06-03', class: classes[2], isCompleted: false },
 ];
 
 export const faceVerificationRequests: FaceVerificationRequest[] = [
