@@ -1,3 +1,4 @@
+
 export type Student = {
   id: string;
   name: string;
@@ -60,7 +61,7 @@ export const students: Student[] = [
 
 export const teachers: Teacher[] = [
   { id: 't1', name: 'Mr. Abhay Choudhary' },
-  { id: 't2', name: 'Ms. Emily Jones' },
+  { id: 't2', name: 'Mr. Saurabh Pathak' },
 ];
 
 export const classes: Class[] = [
