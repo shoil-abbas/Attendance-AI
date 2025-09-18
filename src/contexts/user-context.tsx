@@ -9,6 +9,7 @@ interface UserContextType {
   role: Role;
   setRole: (role: Role) => void;
   name: string;
+  email: string;
   user: Omit<Student, 'avatar'>;
 }
 
@@ -35,12 +36,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const user = useMemo(() => {
     switch (role) {
       case 'student':
-        return { id: 's1', name: 'Akash Sarswat' };
+        return { id: 's1', name: 'Akash Sarswat', email: 'akash@gmail.com' };
       case 'admin':
-        return { id: 'admin1', name: 'Admin User' };
+        return { id: 'admin1', name: 'Admin User', email: 'admin@example.com' };
       case 'teacher':
       default:
-        return { id: 't1', name: 'Mr. Abhay Choudhary' };
+        return { id: 't1', name: 'Mr. Abhay Choudhary', email: 'abhay@gmail.com' };
     }
   }, [role]);
 
@@ -48,6 +49,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     role,
     setRole,
     name: user.name,
+    email: user.email,
     user: user as Omit<Student, 'avatar'>, // Cast is safe for student role, others will have to be handled where used
   };
 

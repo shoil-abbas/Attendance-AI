@@ -16,7 +16,7 @@ import { useUser } from "@/contexts/user-context"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export default function SettingsPage() {
-  const { name } = useUser()
+  const { name, email } = useUser()
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -43,7 +43,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value="abhay@gmail.com" disabled />
+                  <Input id="email" type="email" value={email} disabled />
                 </div>
               </div>
             </CardContent>
