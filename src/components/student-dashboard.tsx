@@ -5,12 +5,12 @@ import {
   BookOpen,
   CheckCircle,
   ClipboardList,
+  Download,
 } from "lucide-react"
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -22,10 +22,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-import { classes, tasks } from "@/lib/mock-data"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useUser } from "@/contexts/user-context"
+import { classes, tasks, attendance, AttendanceRecord } from "@/lib/mock-data"
 
 export default function StudentDashboard() {
+    const { user } = useUser();
+    const studentAttendance = attendance.filter(a => a.student.id === user.id);
+
+     const handleExportCsv = () => {
+        const headers = ["Class", "Date", "Status", "Method"];
+        const csvRows = [
+            headers.join(','),
+            ...studentAttendance.map((record: AttendanceRecord) => 
+                [
+                `"${record.class.name}"`,
+                record.date,
+                record.status,
+                record.method
+                ].join(',')
+            )
+        ];
+        
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'my-attendance-report.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+
     return (
         <>
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -86,29 +118,32 @@ export default function StudentDashboard() {
         </div>
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
             <Card className="xl:col-span-2">
-                <CardHeader>
-                    <CardTitle>Your Tasks</CardTitle>
-                    <CardDescription>
-                        Here are your pending assignments.
-                    </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Recent Attendance</CardTitle>
+                    <Button onClick={handleExportCsv} size="sm" variant="outline">
+                        <Download className="mr-2 h-4 w-4" />
+                        Export CSV
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Task</TableHead>
                                 <TableHead>Class</TableHead>
-                                <TableHead className="text-right">Due Date</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Method</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tasks.map(task => (
-                                <TableRow key={task.id}>
+                            {studentAttendance.map(att => (
+                                <TableRow key={att.id}>
+                                    <TableCell>{att.class.name}</TableCell>
+                                    <TableCell>{att.date}</TableCell>
                                     <TableCell>
-                                        <div className="font-medium">{task.title}</div>
+                                        <Badge variant={att.status === 'Present' ? 'default' : 'destructive'}>{att.status}</Badge>
                                     </TableCell>
-                                    <TableCell>{task.class.name}</TableCell>
-                                    <TableCell className="text-right">{task.dueDate}</TableCell>
+                                    <TableCell className="text-right">{att.method}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

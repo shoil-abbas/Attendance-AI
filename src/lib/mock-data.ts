@@ -100,6 +100,8 @@ export const attendance: AttendanceRecord[] = [
   { id: 'a3', student: students[2], class: classes[0], date: '2024-05-20', status: 'Absent', method: 'Manual' },
   { id: 'a4', student: students[3], class: classes[1], date: '2024-05-21', status: 'Present', method: 'QR' },
   { id: 'a5', student: students[4], class: classes[1], date: '2024-05-21', status: 'Late', method: 'Manual' },
+  { id: 'a6', student: students[0], class: classes[2], date: '2024-05-22', status: 'Present', method: 'Face' },
+  { id: 'a7', student: students[0], class: classes[0], date: '2024-05-27', status: 'Absent', method: 'Manual' },
 ];
 
 export const tasks: Task[] = [
