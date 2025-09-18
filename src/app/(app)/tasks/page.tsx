@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -188,6 +188,8 @@ const TeacherTasks = () => {
 
 const StudentTasks = () => {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast()
 
     const handleTaskCompletionChange = (taskId: string, completed: boolean) => {
         setTasks(currentTasks =>
@@ -197,6 +199,26 @@ const StudentTasks = () => {
         )
     }
 
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            toast({
+                title: "File Selected",
+                description: `${file.name} is ready for upload.`,
+            })
+            // In a real app, you would handle the file upload here.
+        }
+        // Reset file input to allow selecting the same file again
+        if(fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+
     return (
         <Card>
             <CardHeader>
@@ -204,6 +226,12 @@ const StudentTasks = () => {
                 <CardDescription>View and manage your tasks.</CardDescription>
             </CardHeader>
             <CardContent>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                />
                 <div className="space-y-4">
                     {tasks.map(task => (
                         <div key={task.id} className="flex items-start gap-4 rounded-lg border p-4">
@@ -223,7 +251,7 @@ const StudentTasks = () => {
                                         <span>{task.class.name}</span>
                                         <span>Due: {task.dueDate}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" disabled={task.isCompleted}>
+                                    <Button variant="outline" size="sm" disabled={task.isCompleted} onClick={handleUploadClick}>
                                         <Upload className="mr-2 h-4 w-4" />
                                         Upload
                                     </Button>
