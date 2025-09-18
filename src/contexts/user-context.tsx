@@ -35,7 +35,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const user = useMemo(() => {
     switch (role) {
       case 'student':
-        return { id: 's1', name: 'Alice Johnson' };
+        return { id: 's1', name: 'Akash Sarswat' };
       case 'admin':
         return { id: 'admin1', name: 'Admin User' };
       case 'teacher':

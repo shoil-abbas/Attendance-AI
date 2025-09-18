@@ -105,7 +105,7 @@ export default function AdminDashboard() {
                         </TableRow>
                          <TableRow>
                             <TableCell>Attendance Marked</TableCell>
-                            <TableCell>Alice Johnson</TableCell>
+                            <TableCell>Akash Sarswat</TableCell>
                             <TableCell>2024-05-22 10:01 AM</TableCell>
                         </TableRow>
                          <TableRow>

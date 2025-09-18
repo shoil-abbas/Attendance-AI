@@ -51,11 +51,11 @@ export type FaceVerificationRequest = {
 }
 
 export const students: Student[] = [
-  { id: 's1', name: 'Alice Johnson' },
-  { id: 's2', name: 'Bob Williams' },
-  { id: 's3', name: 'Charlie Brown' },
-  { id: 's4', name: 'Diana Miller' },
-  { id: 's5', name: 'Ethan Garcia' },
+  { id: 's1', name: 'Akash Sarswat' },
+  { id: 's2', name: 'Mohd Anas' },
+  { id: 's3', name: 'Mohd Sohil Khan' },
+  { id: 's4', name: 'Arpita Yadav' },
+  { id: 's5', name: 'Md Kaif' },
 ];
 
 export const teachers: Teacher[] = [
