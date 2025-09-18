@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useUser } from '@/contexts/user-context'
 import { suggestTasksForAbsentTeacher, SuggestTasksForAbsentTeacherOutput } from '@/ai/flows/suggest-tasks-absent-teacher'
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Wand2 } from 'lucide-react'
+import { Loader2, Wand2, Upload } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -213,14 +213,20 @@ const StudentTasks = () => {
                                 onCheckedChange={(checked) => handleTaskCompletionChange(task.id, !!checked)}
                                 className="mt-1" 
                             />
-                            <div className="grid gap-1">
+                            <div className="grid gap-1 flex-1">
                                 <label htmlFor={`task-${task.id}`} className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                     {task.title}
                                 </label>
                                 <p className="text-sm text-muted-foreground">{task.description}</p>
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
-                                    <span>{task.class.name}</span>
-                                    <span>Due: {task.dueDate}</span>
+                                <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
+                                    <div className="flex items-center gap-4">
+                                        <span>{task.class.name}</span>
+                                        <span>Due: {task.dueDate}</span>
+                                    </div>
+                                    <Button variant="outline" size="sm" disabled={task.isCompleted}>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Upload
+                                    </Button>
                                 </div>
                             </div>
                         </div>
