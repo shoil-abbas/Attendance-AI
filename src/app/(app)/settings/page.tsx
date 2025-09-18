@@ -25,7 +25,7 @@ export default function SettingsPage() {
         <div className="md:col-span-1">
           <h2 className="text-lg font-semibold">Profile</h2>
           <p className="text-sm text-muted-foreground">
-            Update your personal information.
+            View your personal information.
           </p>
         </div>
         <div className="md:col-span-2">
@@ -39,17 +39,14 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" defaultValue={name} />
+                  <Input id="name" value={name} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="abhay@gmail.com" disabled />
+                  <Input id="email" type="email" value="abhay@gmail.com" disabled />
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button>Save Changes</Button>
-            </CardFooter>
           </Card>
         </div>
       </div>
