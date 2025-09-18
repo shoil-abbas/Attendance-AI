@@ -66,7 +66,7 @@ export default function ReportsPage() {
             <CardTitle>Most Absences (Class)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">Physics 101</div>
+            <div className="text-xl font-bold">DBMS</div>
             <p className="text-xs text-muted-foreground">12 absences this week</p>
           </CardContent>
         </Card>
