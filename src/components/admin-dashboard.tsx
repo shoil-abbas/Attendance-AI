@@ -5,6 +5,7 @@ import {
   BookOpen,
   CheckCircle,
   Users,
+  Download
 } from "lucide-react"
 import {
   Card,
@@ -21,8 +22,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+
+const systemLogs = [
+    { action: 'User Login', actor: 'Mr. Abhay Choudhary', timestamp: '2024-05-22 10:00 AM' },
+    { action: 'Attendance Marked', actor: 'Akash Sarswat', timestamp: '2024-05-22 10:01 AM' },
+    { action: 'Class Created', actor: 'Admin User', timestamp: '2024-05-22 09:30 AM' },
+];
+
 
 export default function AdminDashboard() {
+
+    const handleExportCsv = () => {
+        const headers = ["Action", "Actor", "Timestamp"];
+        const csvRows = [
+            headers.join(','),
+            ...systemLogs.map(log => 
+                [
+                `"${log.action}"`,
+                `"${log.actor}"`,
+                `"${log.timestamp}"`
+                ].join(',')
+            )
+        ];
+        
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'system-logs.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <>
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -84,9 +119,15 @@ export default function AdminDashboard() {
           </Card>
         </div>
         <Card>
-            <CardHeader>
-                <CardTitle>System Logs</CardTitle>
-                <CardDescription>Recent system-wide activities.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>System Logs</CardTitle>
+                    <CardDescription>Recent system-wide activities.</CardDescription>
+                </div>
+                <Button onClick={handleExportCsv} size="sm" variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export CSV
+                </Button>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -98,21 +139,13 @@ export default function AdminDashboard() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
-                            <TableCell>User Login</TableCell>
-                            <TableCell>Mr. Abhay Choudhary</TableCell>
-                            <TableCell>2024-05-22 10:00 AM</TableCell>
-                        </TableRow>
-                         <TableRow>
-                            <TableCell>Attendance Marked</TableCell>
-                            <TableCell>Akash Sarswat</TableCell>
-                            <TableCell>2024-05-22 10:01 AM</TableCell>
-                        </TableRow>
-                         <TableRow>
-                            <TableCell>Class Created</TableCell>
-                            <TableCell>Admin User</TableCell>
-                            <TableCell>2024-05-22 09:30 AM</TableCell>
-                        </TableRow>
+                        {systemLogs.map((log, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{log.action}</TableCell>
+                                <TableCell>{log.actor}</TableCell>
+                                <TableCell>{log.timestamp}</TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </CardContent>
