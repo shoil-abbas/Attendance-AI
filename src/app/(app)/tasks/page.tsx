@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -31,13 +30,12 @@ import { Loader2, Wand2 } from 'lucide-react'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { tasks } from '@/lib/mock-data'
+import { tasks as initialTasks, Task } from '@/lib/mock-data'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const formSchema = z.object({
@@ -189,6 +187,16 @@ const TeacherTasks = () => {
 }
 
 const StudentTasks = () => {
+    const [tasks, setTasks] = useState<Task[]>(initialTasks)
+
+    const handleTaskCompletionChange = (taskId: string, completed: boolean) => {
+        setTasks(currentTasks =>
+            currentTasks.map(task =>
+                task.id === taskId ? { ...task, isCompleted: completed } : task
+            )
+        )
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -199,7 +207,12 @@ const StudentTasks = () => {
                 <div className="space-y-4">
                     {tasks.map(task => (
                         <div key={task.id} className="flex items-start gap-4 rounded-lg border p-4">
-                            <Checkbox id={`task-${task.id}`} checked={task.isCompleted} className="mt-1" />
+                            <Checkbox 
+                                id={`task-${task.id}`} 
+                                checked={task.isCompleted} 
+                                onCheckedChange={(checked) => handleTaskCompletionChange(task.id, !!checked)}
+                                className="mt-1" 
+                            />
                             <div className="grid gap-1">
                                 <label htmlFor={`task-${task.id}`} className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                     {task.title}
