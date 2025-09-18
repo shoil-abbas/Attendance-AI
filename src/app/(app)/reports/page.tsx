@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { attendance, classes, students } from "@/lib/mock-data"
+import { attendance, classes, students, AttendanceRecord } from "@/lib/mock-data"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const chartData = [
@@ -32,11 +32,39 @@ const chartData = [
 ]
 
 export default function ReportsPage() {
+
+  const handleExportCsv = () => {
+    const headers = ["Student", "Class", "Date", "Status", "Method"];
+    const csvRows = [
+      headers.join(','),
+      ...attendance.map((record: AttendanceRecord) => 
+        [
+          `"${record.student.name}"`,
+          `"${record.class.name}"`,
+          record.date,
+          record.status,
+          record.method
+        ].join(',')
+      )
+    ];
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'attendance-report.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Attendance Reports</h1>
-        <Button>
+        <Button onClick={handleExportCsv}>
           <Download className="mr-2 h-4 w-4" />
           Export CSV
         </Button>
