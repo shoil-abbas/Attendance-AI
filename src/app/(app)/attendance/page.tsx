@@ -372,7 +372,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                 videoRef.current.setAttribute("playsinline", "true");
                 await videoRef.current.play();
             }
-        } catch (err) => {
+        } catch (err) {
             console.error("Error accessing camera: ", err);
             toast({ title: "Camera Error", description: "Could not access camera. Please check permissions.", variant: "destructive" });
             setIsVerifying(false);
