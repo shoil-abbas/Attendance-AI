@@ -231,6 +231,7 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
 const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
     const { toast } = useToast();
     const { user } = useUser();
+    const [isCheckingLocation, setIsCheckingLocation] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
@@ -262,7 +263,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
-                videoRef.current.setAttribute("playsinline", "true");
+                videoRef.current.setAttribute("playsinline", "true"); // for iOS
                 await videoRef.current.play();
                 setIsVerifying(true);
             }
@@ -272,12 +273,11 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
         }
     }
 
-    const handleFaceVerification = async () => {
-        setIsSubmitting(true);
-        setVerificationStatus(null);
+    const handleFaceVerification = () => {
+        setIsCheckingLocation(true);
         if (!navigator.geolocation) {
             toast({ title: "Geolocation Error", description: "Geolocation is not supported by your browser.", variant: "destructive" });
-            setIsSubmitting(false);
+            setIsCheckingLocation(false);
             return;
         }
 
@@ -287,7 +287,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                 const distance = getDistance(latitude, longitude, classLocation.lat, classLocation.lon);
 
                 if (distance <= allowedRadius) {
-                    openCamera();
+                    openCamera(); // This will set isVerifying to true and open the dialog
                 } else {
                     toast({
                         title: "Location Error",
@@ -295,11 +295,11 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                         variant: "destructive",
                     });
                 }
-                setIsSubmitting(false);
+                setIsCheckingLocation(false);
             },
             () => {
                 toast({ title: "Location Error", description: "Could not get your location. Please enable location services.", variant: "destructive" });
-                setIsSubmitting(false);
+                setIsCheckingLocation(false);
             }, { enableHighAccuracy: true }
         );
     };
@@ -391,9 +391,9 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                         <CardDescription>Join your class session using face recognition.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button size="lg" className="h-24 w-full" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending' || isSubmitting}>
-                            {isSubmitting ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Camera className="mr-2 h-6 w-6" />}
-                             {isSubmitting ? 'Checking Location...' : 'Use Face Recognition'}
+                        <Button size="lg" className="h-24 w-full" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending' || isCheckingLocation}>
+                            {isCheckingLocation ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Camera className="mr-2 h-6 w-6" />}
+                             {isCheckingLocation ? 'Checking Location...' : 'Use Face Recognition'}
                         </Button>
                     </CardContent>
                      {verificationStatus === 'pending' && (
@@ -448,7 +448,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                     </div>
                     <DialogFooter className="sm:justify-between">
                          <Button variant="outline" onClick={stopVerificationCamera} disabled={isSubmitting}>Cancel</Button>
-                         <Button onClick={captureAndSubmit}>
+                         <Button onClick={captureAndSubmit} disabled={isSubmitting}>
                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
                              {isSubmitting ? 'Verifying...' : 'Capture and Submit'}
                          </Button>
@@ -471,7 +471,5 @@ export default function AttendancePage() {
         </div>
     )
 }
-
-    
 
     
