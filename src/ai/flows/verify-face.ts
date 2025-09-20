@@ -33,14 +33,17 @@ const verifyFacePrompt = ai.definePrompt({
   name: 'verifyFacePrompt',
   input: {schema: VerifyFaceInputSchema},
   output: {schema: VerifyFaceOutputSchema},
-  prompt: `You are an AI assistant that verifies if an image contains a human face.
-
-  Analyze the provided image and determine if there is a human face present.
-  The face should be reasonably clear and not an object, animal, or abstract shape.
+  prompt: `You are an AI assistant that verifies if an image contains a human face. Your task is to analyze the provided image and determine if there is a clear, single human face present.
 
   Image: {{media url=photoDataUri}}
 
-  If a human face is detected, set hasFace to true. Otherwise, set it to false and provide a brief reason.`,
+  Follow these rules strictly:
+  1.  If a clear, unobstructed human face is visible, set 'hasFace' to true and set the 'reason' to "Human face detected.".
+  2.  If the image is blurry, dark, or the face is too small or at a difficult angle, set 'hasFace' to false and the 'reason' to "Face is not clear enough for verification.".
+  3.  If there is no human face (e.g., it's an object, animal, or empty scene), set 'hasFace' to false and 'reason' to "No human face was found in the image.".
+  4.  If there are multiple faces, set 'hasFace' to false and 'reason' to "Multiple faces were detected. Please ensure only one person is in the frame.".
+
+  Provide your response based on these rules.`,
 });
 
 const verifyFaceFlow = ai.defineFlow(
