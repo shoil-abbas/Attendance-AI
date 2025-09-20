@@ -663,7 +663,7 @@ const StudentAttendance = ({
             >
               Cancel
             </Button>
-            <Button onClick={captureAndSubmit} disabled={isSubmitting || hasCameraPermission !== true}>
+            <Button onClick={captureAndSubmit}>
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -698,3 +698,5 @@ export default function AttendancePage() {
     </div>
   )
 }
+
+    
