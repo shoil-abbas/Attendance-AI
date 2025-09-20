@@ -239,7 +239,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Hardcoded class location and radius
-    const classLocation = { lat: 28.6542, lon: 77.2373 };
+    const classLocation = { lat: 28.688702547493328, lon: 77.45572644713074 };
     const allowedRadius = 50; // in meters
 
     const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
