@@ -427,8 +427,6 @@ const StudentAttendance = ({
   }, [wantsToVerify]);
   
   useEffect(() => {
-    // This effect handles getting camera permission and setting up the stream
-    // It runs when isVerifying becomes true.
     const getCameraPermission = async () => {
       if (isVerifying) {
         try {
@@ -456,6 +454,16 @@ const StudentAttendance = ({
 
   const captureAndSubmit = async () => {
     if (videoRef.current && canvasRef.current && user) {
+      const studentData = students.find(s => s.id === user.id);
+      if (!studentData?.referencePhotoUri) {
+          toast({
+            title: 'Verification Failed',
+            description: 'No reference photo found for your profile. Please contact an admin.',
+            variant: 'destructive',
+          });
+          return;
+      }
+        
       setIsSubmitting(true)
       const video = videoRef.current
       const canvas = canvasRef.current
@@ -466,13 +474,13 @@ const StudentAttendance = ({
       const photoDataUri = canvas.toDataURL('image/jpeg')
 
       try {
-        const { hasFace, reason } = await verifyFace({ photoDataUri })
-        if (!hasFace) {
+        const { isMatch, reason } = await verifyFace({ photoDataUri, referencePhotoUri: studentData.referencePhotoUri })
+        if (!isMatch) {
           toast({
-            title: 'Face Not Detected',
+            title: 'Face Verification Failed',
             description:
               reason ||
-              'Please ensure your face is clearly visible and try again.',
+              'Your face did not match the profile. Please try again.',
             variant: 'destructive',
           })
           setIsSubmitting(false)
@@ -482,7 +490,7 @@ const StudentAttendance = ({
         console.error('Error verifying face:', error)
         toast({
           title: 'Verification Failed',
-          description: 'Could not verify the image. Please try again.',
+          description: 'Could not verify your face. Please try again.',
           variant: 'destructive',
         })
         setIsSubmitting(false)
@@ -624,8 +632,7 @@ const StudentAttendance = ({
           <DialogHeader>
             <DialogTitle>Face Verification</DialogTitle>
             <DialogDescription>
-              Ensure you are in a well-lit area. Position your face in the
-              frame and capture your photo.
+              Ensure you are in a well-lit area, with your face clearly visible and centered in the frame.
             </DialogDescription>
           </DialogHeader>
           <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
@@ -691,5 +698,3 @@ export default function AttendancePage() {
     </div>
   )
 }
-
-    

@@ -2,6 +2,7 @@
 export type Student = {
   id: string;
   name: string;
+  referencePhotoUri?: string;
 };
 
 export type Teacher = {
@@ -25,7 +26,7 @@ export type Class = {
 };
 
 export type AttendanceRecord = {
-  id: string;
+  id:string;
   student: Student;
   class: Class;
   date: string;
@@ -51,12 +52,14 @@ export type FaceVerificationRequest = {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+const mockPhoto = "data:image/jpeg;base64,";
+
 export const students: Student[] = [
-  { id: 's1', name: 'Akash Sarswat' },
-  { id: 's2', name: 'Mohd Anas' },
-  { id: 's3', name: 'Mohd Sohil Khan' },
-  { id: 's4', name: 'Arpita Yadav' },
-  { id: 's5', name: 'Md Kaif' },
+  { id: 's1', name: 'Akash Sarswat', referencePhotoUri: mockPhoto },
+  { id: 's2', name: 'Mohd Anas', referencePhotoUri: mockPhoto },
+  { id: 's3', name: 'Mohd Sohil Khan', referencePhotoUri: mockPhoto },
+  { id: 's4', name: 'Arpita Yadav', referencePhotoUri: mockPhoto },
+  { id: 's5', name: 'Md Kaif', referencePhotoUri: mockPhoto },
 ];
 
 export const teachers: Teacher[] = [
@@ -110,14 +113,12 @@ export const tasks: Task[] = [
   { id: 'task3', title: 'Assignment 3', description: 'Submit the full lab report from last week\'s experiment.', dueDate: '2024-06-03', class: classes[2], isCompleted: false },
 ];
 
-const mockPhoto = "data:image/jpeg;base64,";
-
 export const faceVerificationRequests: FaceVerificationRequest[] = [
     {
         id: 'fv1',
         student: students[3],
         photoDataUri: mockPhoto,
-        location: { lat: 28.688702547493328, lon: 77.45572644713074 },
+        location: { lat: 28.688702, lon: 77.455726 },
         timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
         status: 'pending',
     },
@@ -125,7 +126,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
         id: 'fv2',
         student: students[4],
         photoDataUri: mockPhoto,
-        location: { lat: 28.688702547493328, lon: 77.45572644713074 },
+        location: { lat: 28.688702, lon: 77.455726 },
         timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
         status: 'pending',
     }
