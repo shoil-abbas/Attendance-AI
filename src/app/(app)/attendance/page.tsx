@@ -239,7 +239,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Hardcoded class location and radius
-    const classLocation = { lat: 28.6139, lon: 77.2090 }; // India Gate, New Delhi
+    const classLocation = { lat: 28.6542, lon: 77.2373 };
     const allowedRadius = 50; // in meters
 
     const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
