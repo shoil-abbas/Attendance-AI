@@ -448,7 +448,7 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                     </div>
                     <DialogFooter className="sm:justify-between">
                          <Button variant="outline" onClick={stopVerificationCamera} disabled={isSubmitting}>Cancel</Button>
-                         <Button onClick={captureAndSubmit} disabled={isSubmitting}>
+                         <Button onClick={captureAndSubmit}>
                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
                              {isSubmitting ? 'Verifying...' : 'Capture and Submit'}
                          </Button>
@@ -471,5 +471,7 @@ export default function AttendancePage() {
         </div>
     )
 }
+
+    
 
     
