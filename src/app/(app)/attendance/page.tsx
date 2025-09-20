@@ -238,21 +238,70 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const handleFaceVerification = async () => {
-        setIsVerifying(true);
-        setVerificationStatus(null);
+    // Hardcoded class location and radius
+    const classLocation = { lat: 28.6139, lon: 77.2090 }; // India Gate, New Delhi
+    const allowedRadius = 50; // in meters
+
+    const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371e3; // metres
+        const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+        const φ2 = lat2 * Math.PI/180;
+        const Δφ = (lat2-lat1) * Math.PI/180;
+        const Δλ = (lon2-lon1) * Math.PI/180;
+
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        return R * c; // in metres
+    }
+
+    const openCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 videoRef.current.setAttribute("playsinline", "true");
                 await videoRef.current.play();
+                setIsVerifying(true);
             }
         } catch (err) {
             console.error("Error accessing camera: ", err);
             toast({ title: "Camera Error", description: "Could not access camera. Please check permissions.", variant: "destructive" });
-            setIsVerifying(false);
         }
+    }
+
+    const handleFaceVerification = async () => {
+        setIsSubmitting(true);
+        setVerificationStatus(null);
+        if (!navigator.geolocation) {
+            toast({ title: "Geolocation Error", description: "Geolocation is not supported by your browser.", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const distance = getDistance(latitude, longitude, classLocation.lat, classLocation.lon);
+
+                if (distance <= allowedRadius) {
+                    openCamera();
+                } else {
+                    toast({
+                        title: "Location Error",
+                        description: `You are not at the correct location. You are ${distance.toFixed(0)} meters away.`,
+                        variant: "destructive",
+                    });
+                }
+                setIsSubmitting(false);
+            },
+            () => {
+                toast({ title: "Location Error", description: "Could not get your location. Please enable location services.", variant: "destructive" });
+                setIsSubmitting(false);
+            }, { enableHighAccuracy: true }
+        );
     };
 
     const captureAndSubmit = async () => {
@@ -312,14 +361,15 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                         title: "Submitted for Verification",
                         description: "Your photo has been sent to the teacher for approval.",
                     });
+                    setIsSubmitting(false);
                 },
                 (error) => {
                     console.error("Error getting location: ", error);
                     toast({ title: "Location Error", description: "Could not get your location. Please enable location services.", variant: "destructive" });
+                    setIsSubmitting(false);
                 }, { enableHighAccuracy: true }
             );
         }
-        setIsSubmitting(false);
     };
     
     const stopVerificationCamera = () => {
@@ -341,8 +391,9 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                         <CardDescription>Join your class session using face recognition.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button size="lg" className="h-24 w-full" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending'}>
-                            <Camera className="mr-2 h-6 w-6" /> Use Face Recognition
+                        <Button size="lg" className="h-24 w-full" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending' || isSubmitting}>
+                            {isSubmitting ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Camera className="mr-2 h-6 w-6" />}
+                             {isSubmitting ? 'Checking Location...' : 'Use Face Recognition'}
                         </Button>
                     </CardContent>
                      {verificationStatus === 'pending' && (
