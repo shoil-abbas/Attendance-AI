@@ -110,11 +110,13 @@ export const tasks: Task[] = [
   { id: 'task3', title: 'Assignment 3', description: 'Submit the full lab report from last week\'s experiment.', dueDate: '2024-06-03', class: classes[2], isCompleted: false },
 ];
 
+const mockPhoto = "data:image/jpeg;base64,";
+
 export const faceVerificationRequests: FaceVerificationRequest[] = [
     {
         id: 'fv1',
         student: students[3],
-        photoDataUri: '',
+        photoDataUri: mockPhoto,
         location: { lat: 28.688702547493328, lon: 77.45572644713074 },
         timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
         status: 'pending',
@@ -122,7 +124,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
      {
         id: 'fv2',
         student: students[4],
-        photoDataUri: '',
+        photoDataUri: mockPhoto,
         location: { lat: 28.688702547493328, lon: 77.45572644713074 },
         timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
         status: 'pending',
