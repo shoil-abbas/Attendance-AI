@@ -21,7 +21,7 @@ export type VerifyFaceInput = z.infer<typeof VerifyFaceInputSchema>;
 
 const VerifyFaceOutputSchema = z.object({
   hasFace: z.boolean().describe('Whether or not the image contains a human face.'),
-  reason: z.string().describe('The reason for the decision.'),
+  reason: z.string().describe('The reason for the decision, explaining why a face was or was not detected.'),
 });
 export type VerifyFaceOutput = z.infer<typeof VerifyFaceOutputSchema>;
 
@@ -33,17 +33,19 @@ const verifyFacePrompt = ai.definePrompt({
   name: 'verifyFacePrompt',
   input: {schema: VerifyFaceInputSchema},
   output: {schema: VerifyFaceOutputSchema},
-  prompt: `You are an AI assistant that verifies if an image contains a human face. Your task is to analyze the provided image and determine if there is a clear, single human face present.
+  prompt: `You are an AI assistant that verifies if an image contains a human face for an attendance system. Your task is to analyze the provided image and determine if there is one, and only one, clear human face present.
 
-  Image: {{media url=photoDataUri}}
+Image: {{media url=photoDataUri}}
 
-  Follow these rules strictly:
-  1.  If a clear, unobstructed human face is visible, set 'hasFace' to true and set the 'reason' to "Human face detected.".
-  2.  If the image is blurry, dark, or the face is too small or at a difficult angle, set 'hasFace' to false and the 'reason' to "Face is not clear enough for verification.".
-  3.  If there is no human face (e.g., it's an object, animal, or empty scene), set 'hasFace' to false and 'reason' to "No human face was found in the image.".
-  4.  If there are multiple faces, set 'hasFace' to false and 'reason' to "Multiple faces were detected. Please ensure only one person is in the frame.".
+Analyze the image and respond according to these rules:
 
-  Provide your response based on these rules.`,
+1.  **Clear Face Detected**: If a single, clear, and reasonably centered human face is visible, set 'hasFace' to true. The reason should be "Human face detected."
+2.  **No Face**: If there is no human face at all (e.g., an object, animal, or empty scene), set 'hasFace' to false. The reason should be "No human face was found in the image."
+3.  **Not Clear Enough**: If a face is present but is blurry, too dark, heavily shadowed, too small, or at an extreme angle, set 'hasFace' to false. The reason should be "Face is not clear enough for verification. Please try again in a well-lit area."
+4.  **Multiple Faces**: If more than one face is detected, set 'hasFace' to false. The reason should be "Multiple faces were detected. Please ensure only one person is in the frame."
+5.  **Obstruction**: If the face is partially covered by a hand, object, or excessive hair, set 'hasFace' to false. The reason should be "Face is partially obstructed. Please ensure your face is fully visible."
+
+Provide a response strictly following these rules. Your analysis is critical for automated attendance.`,
 });
 
 const verifyFaceFlow = ai.defineFlow(
