@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
-import jsQR from 'jsqr'
 import {
   Camera,
-  QrCode,
   MapPin,
   Clock,
   Check,
@@ -62,8 +59,7 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
     const { toast } = useToast()
     const [selectedClass, setSelectedClass] = useState<string | null>(null)
     const [sessionStarted, setSessionStarted] = useState(false)
-    const [attendanceMethod, setAttendanceMethod] = useState<'qr' | 'face' | null>(null)
-    const [sessionQrValue, setSessionQrValue] = useState<string | null>(null)
+    const [attendanceMethod, setAttendanceMethod] = useState<'face' | null>(null)
 
     const handleVerification = (id: string, status: 'approved' | 'rejected') => {
         setVerifications(verifications.map(v => v.id === id ? {...v, status} : v));
@@ -76,18 +72,13 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
     const handleStartSession = () => {
         if(selectedClass) {
             setSessionStarted(true)
-            const sessionValue = JSON.stringify({
-                classId: selectedClass,
-                timestamp: Date.now(),
-            });
-            setSessionQrValue(sessionValue);
+            setAttendanceMethod('face')
         }
     }
     
     const handleEndSession = () => {
         setSessionStarted(false); 
         setAttendanceMethod(null);
-        setSessionQrValue(null);
     }
 
     const currentClass = classes.find(c => c.id === selectedClass);
@@ -129,29 +120,6 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
                                     <h3 className="text-lg font-semibold">{currentClass?.name} Session</h3>
                                      <Button variant="outline" size="sm" onClick={handleEndSession}>End Session</Button>
                                  </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Button variant={attendanceMethod === 'qr' ? 'default' : 'outline'} size="lg" className="h-auto py-4" onClick={() => setAttendanceMethod('qr')}>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <QrCode className="w-8 h-8"/>
-                                            <span>QR Code</span>
-                                        </div>
-                                    </Button>
-                                    <Button variant={attendanceMethod === 'face' ? 'default' : 'outline'} size="lg" className="h-auto py-4" onClick={() => setAttendanceMethod('face')}>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Camera className="w-8 h-8"/>
-                                            <span>Face Recognition</span>
-                                        </div>
-                                    </Button>
-                                </div>
-                                {attendanceMethod === 'qr' && sessionQrValue && (
-                                    <Card className="flex flex-col items-center p-6 bg-secondary">
-                                        <CardTitle>Scan to Join</CardTitle>
-                                        <CardDescription>Students can scan this QR code to mark attendance.</CardDescription>
-                                        <div className="p-4 my-4 bg-white rounded-lg">
-                                          <QRCodeSVG value={sessionQrValue} size={256} />
-                                        </div>
-                                    </Card>
-                                )}
                                 {attendanceMethod === 'face' && (
                                     <Card className="p-4">
                                        <CardTitle className="mb-2">Live Verification</CardTitle>
@@ -263,107 +231,12 @@ const TeacherAttendance = ({ verifications, setVerifications }: { verifications:
 const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispatch<React.SetStateAction<FaceVerificationRequest[]>> }) => {
     const { toast } = useToast();
     const { user } = useUser();
-    const [isScanning, setIsScanning] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const requestRef = useRef<number>();
-
-    const startScan = async () => {
-        setIsScanning(true);
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.setAttribute("playsinline", "true"); 
-                await videoRef.current.play();
-                requestRef.current = requestAnimationFrame(tick);
-            }
-        } catch (err) {
-            console.error("Error accessing camera: ", err);
-            handleScanError("Could not access camera. Please check permissions.");
-        }
-    };
-
-    const stopScan = () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
-            videoRef.current.srcObject = null;
-        }
-        if (requestRef.current) {
-            cancelAnimationFrame(requestRef.current);
-        }
-        setIsScanning(false);
-    };
-
-    const tick = () => {
-        if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            const context = canvas.getContext("2d");
-
-            if (context) {
-                canvas.height = video.videoHeight;
-                canvas.width = video.videoWidth;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-
-                if (code && code.data) {
-                    handleScanSuccess(code.data);
-                    return; 
-                }
-            }
-        }
-        requestRef.current = requestAnimationFrame(tick);
-    };
-    
-    useEffect(() => {
-        return () => {
-            if (requestRef.current) {
-                cancelAnimationFrame(requestRef.current);
-            }
-        };
-    }, []);
-
-
-    const handleScanSuccess = (scannedData: string | null) => {
-        stopScan();
-
-        if (!scannedData) {
-            handleScanError("No data found in QR code.");
-            return;
-        }
-        
-        try {
-            const data = JSON.parse(scannedData);
-            if (data.classId && data.timestamp) {
-                toast({
-                    title: "Attendance Marked!",
-                    description: "You have been successfully marked as present.",
-                });
-            } else {
-                throw new Error("Invalid QR code data");
-            }
-        } catch (e) {
-            handleScanError("The scanned QR code is not a valid attendance code.");
-        }
-    };
-
-    const handleScanError = (errorMessage: string) => {
-        stopScan();
-        toast({
-            title: "Scan Failed",
-            description: errorMessage,
-            variant: "destructive",
-        });
-    };
 
     const handleFaceVerification = async () => {
         setIsVerifying(true);
@@ -465,13 +338,10 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                 <Card>
                     <CardHeader>
                         <CardTitle>Join Session</CardTitle>
-                        <CardDescription>Join your class session using one of the methods below.</CardDescription>
+                        <CardDescription>Join your class session using face recognition.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid md:grid-cols-2 gap-4">
-                        <Button size="lg" className="h-24" onClick={startScan} disabled={isScanning || verificationStatus === 'pending'}>
-                            <QrCode className="mr-2 h-6 w-6" /> Scan QR Code
-                        </Button>
-                        <Button size="lg" className="h-24" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending'}>
+                    <CardContent>
+                        <Button size="lg" className="h-24 w-full" variant="secondary" onClick={handleFaceVerification} disabled={isVerifying || verificationStatus === 'pending'}>
                             <Camera className="mr-2 h-6 w-6" /> Use Face Recognition
                         </Button>
                     </CardContent>
@@ -513,23 +383,6 @@ const StudentAttendance = ({ setVerifications }: { setVerifications: React.Dispa
                     </CardContent>
                 </Card>
             </div>
-            <Dialog open={isScanning} onOpenChange={(open) => !open && stopScan()}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Scan QR Code</DialogTitle>
-                        <DialogDescription>
-                            Point your camera at the QR code displayed by the teacher.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                        <video ref={videoRef} className="h-full w-full object-cover" muted playsInline />
-                        <canvas ref={canvasRef} className="hidden" />
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={stopScan}>Cancel</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
              <Dialog open={isVerifying} onOpenChange={(open) => !open && stopVerificationCamera()}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
