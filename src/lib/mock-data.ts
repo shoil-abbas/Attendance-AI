@@ -115,7 +115,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
         id: 'fv1',
         student: students[3],
         photoDataUri: '',
-        location: { lat: 34.0522, lon: -118.2437 },
+        location: { lat: 28.6542, lon: 77.2373 },
         timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
         status: 'pending',
     },
@@ -123,7 +123,7 @@ export const faceVerificationRequests: FaceVerificationRequest[] = [
         id: 'fv2',
         student: students[4],
         photoDataUri: '',
-        location: { lat: 40.7128, lon: -74.0060 },
+        location: { lat: 28.6542, lon: 77.2373 },
         timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
         status: 'pending',
     }
