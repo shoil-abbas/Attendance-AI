@@ -328,6 +328,7 @@ const StudentAttendance = ({
     'pending' | 'success' | 'failed' | null
   >(null)
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [wantsToVerify, setWantsToVerify] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -350,76 +351,108 @@ const StudentAttendance = ({
 
     return R * c // in metres
   }
-
+  
   const openCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
       setHasCameraPermission(true);
       if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.setAttribute('playsinline', 'true') // for iOS
-        await videoRef.current.play()
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('playsinline', 'true'); // for iOS
+        await videoRef.current.play();
       }
-      setIsVerifying(true)
+      setIsVerifying(true);
     } catch (err) {
-      console.error('Error accessing camera: ', err)
+      console.error('Error accessing camera: ', err);
       setHasCameraPermission(false);
+      setIsVerifying(false);
       toast({
         title: 'Camera Error',
-        description:
-          'Could not access camera. Please check permissions and ensure you are on a secure (HTTPS) connection.',
+        description: 'Could not access camera. Please check permissions.',
         variant: 'destructive',
-      })
+      });
     }
-  }
+  };
 
-  const handleFaceVerification = () => {
-    setIsCheckingLocation(true)
-    if (!navigator.geolocation) {
-      toast({
-        title: 'Geolocation Error',
-        description: 'Geolocation is not supported by your browser.',
-        variant: 'destructive',
-      })
-      setIsCheckingLocation(false)
-      return
-    }
+  useEffect(() => {
+    if (wantsToVerify) {
+      setIsCheckingLocation(true);
+      if (!navigator.geolocation) {
+        toast({
+          title: 'Geolocation Error',
+          description: 'Geolocation is not supported by your browser.',
+          variant: 'destructive',
+        });
+        setIsCheckingLocation(false);
+        setWantsToVerify(false);
+        return;
+      }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords
-        const distance = getDistance(
-          latitude,
-          longitude,
-          classLocation.lat,
-          classLocation.lon
-        )
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const distance = getDistance(
+            latitude,
+            longitude,
+            classLocation.lat,
+            classLocation.lon
+          );
 
-        if (distance <= allowedRadius) {
-          openCamera() // This will set isVerifying to true and open the dialog
-        } else {
+          if (distance <= allowedRadius) {
+            openCamera();
+          } else {
+            toast({
+              title: 'Location Error',
+              description: `You are not at the correct location. You are ${distance.toFixed(
+                0
+              )} meters away.`,
+              variant: 'destructive',
+            });
+          }
+          setIsCheckingLocation(false);
+          setWantsToVerify(false);
+        },
+        () => {
           toast({
             title: 'Location Error',
-            description: `You are not at the correct location. You are ${distance.toFixed(
-              0
-            )} meters away.`,
+            description: 'Could not get your location. Please enable location services.',
             variant: 'destructive',
-          })
+          });
+          setIsCheckingLocation(false);
+          setWantsToVerify(false);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, [wantsToVerify]);
+  
+  useEffect(() => {
+    // This effect handles getting camera permission and setting up the stream
+    // It runs when isVerifying becomes true.
+    const getCameraPermission = async () => {
+      if (isVerifying) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({video: true});
+          setHasCameraPermission(true);
+
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setHasCameraPermission(false);
+          toast({
+            variant: 'destructive',
+            title: 'Camera Access Denied',
+            description: 'Please enable camera permissions in your browser settings to use this app.',
+          });
         }
-        setIsCheckingLocation(false)
-      },
-      () => {
-        toast({
-          title: 'Location Error',
-          description:
-            'Could not get your location. Please enable location services.',
-          variant: 'destructive',
-        })
-        setIsCheckingLocation(false)
-      },
-      { enableHighAccuracy: true }
-    )
-  }
+      }
+    };
+
+    getCameraPermission();
+  }, [isVerifying]);
+
 
   const captureAndSubmit = async () => {
     if (videoRef.current && canvasRef.current && user) {
@@ -522,7 +555,7 @@ const StudentAttendance = ({
               size="lg"
               className="h-24 w-full"
               variant="secondary"
-              onClick={handleFaceVerification}
+              onClick={() => setWantsToVerify(true)}
               disabled={
                 isVerifying ||
                 verificationStatus === 'pending' ||
@@ -599,6 +632,7 @@ const StudentAttendance = ({
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
+              autoPlay
               muted
               playsInline
             />
@@ -657,3 +691,5 @@ export default function AttendancePage() {
     </div>
   )
 }
+
+    
